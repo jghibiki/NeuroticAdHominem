@@ -27,4 +27,4 @@ class Options(object):
         self.log_device_placement = False # Log placement of ops on devices
         self.display_train_steps = False #"toggles output of training step results")
 
-        selt.model_location = "model.ckpt"
+        self.model_location = "model.ckpt"
