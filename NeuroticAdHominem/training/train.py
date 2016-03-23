@@ -1,4 +1,3 @@
-import cPickle as pickle
 from tensorflow.models.rnn.rnn_cell import BasicLSTMCell, LSTMCell
 import itertools
 from collections import Counter

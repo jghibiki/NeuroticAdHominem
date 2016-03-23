@@ -18,16 +18,14 @@ from training.train import train
 from training import preprocess
 
 from hosting.host import launch as hosting_launch
-from hosting.host import eval as evalString
+from hosting.host import eval
 
-import api
-from api.ApiController import launch as api_launch
+from app.Server import launch as app_launch
 
 def launch():
     hosting_launch()
-    api_launch()
-    print(evalString("bill clinton is an idiot"))
-
+    app_launch()
+    print(eval("bill clinton is an idiot"))
 
 
 sentences = []

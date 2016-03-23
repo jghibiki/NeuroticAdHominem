@@ -47,6 +47,7 @@ def host(conn):
 
         # get word id's
         for word in padded_sentence:
+            word = word.encode('ascii', 'replace')
             if(word not in nah.vocabulary.keys()):
                 nah.vocabulary_inv.append(word)
                 nah.vocabulary[word] = nah.vocabulary_inv.index(word)

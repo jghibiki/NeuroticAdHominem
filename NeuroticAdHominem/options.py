@@ -12,6 +12,7 @@ class Options(object):
         self.num_filters = 50  # Number of filters per filter size (default: 128)
         self.dropout_keep_prob = 0.5 # Dropout keep probability (default: 0.5)
         self.l2_reg_lambda =  3.0 # L2 regularizaion lambda (default: 0.0)
+        self.vocab_oversizing = 5000 # how many words to leave room for
 
         # Training parameters
         self.batch_size = 64 # Batch Size (default: 64)

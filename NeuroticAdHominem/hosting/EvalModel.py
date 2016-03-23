@@ -19,7 +19,7 @@ class EvalModel(object):
         cnn = TextCNN(
             sequence_length=opts.sentence_padding,
             num_classes=2,
-            vocab_size=len(nah.vocabulary),
+            vocab_size=len(nah.vocabulary) + opts.vocab_oversizing,
             embedding_size=opts.embedding_dim,
             filter_sizes=map(int, opts.filter_sizes.split(",")),
             num_filters=opts.num_filters,
@@ -47,6 +47,7 @@ class EvalModel(object):
           self.cnn.input_y: np.array([[1,0]]),
           self.cnn.dropout_keep_prob: 1.0
         }
+
         accuracy = self.session.run([self.cnn.accuracy], feed_dict)[0]
 
         if(int(accuracy) is 1):
