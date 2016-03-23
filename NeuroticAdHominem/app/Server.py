@@ -1,21 +1,22 @@
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_socketio import SocketIO, emit
 from NeuroticAdHominem import eval
 
 def launch():
 
     app = Flask(__name__, static_url_path='', static_folder='app')
     app.secret_key = "bGhmsER0KydumulGTRa2"
-    api = Api(app)
+    socketio = SocketIO(app)
+
 
     @app.route('/')
     def root():
         return app.send_static_file('index.html')
 
-    class EvalString(Resource):
-        def get(self, test):
-            return {"result": eval(test)}
+    @socketio.on("eval")
+    def handle_eval(stringToEval):
+        result = eval(stringToEval)
+        emit("eval::response", result)
 
-    api.add_resource(EvalString, "/eval/<string:test>")
-
-    app.run(debug=True, host="0.0.0.0")
+    #start server
+    socketio.run(app, debug=True, host="0.0.0.0")

@@ -1,12 +1,18 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
-angular.module('myApp', [
+angular.module('nah', [
   'ngRoute',
-  'myApp.view1',
-  'myApp.view2',
-  'myApp.version'
+  'btford.socket-io',
+  'nah.feed',
+  'nah.view2',
+  'nah.version'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/view1'});
-}]);
+  $routeProvider.otherwise({redirectTo: '/nah'});
+}]).
+factory('socket', function (socketFactory) {
+  return socketFactory({
+    ioSocket: io.connect()
+  });
+});

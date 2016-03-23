@@ -1,7 +1,3 @@
 flask
-flask-cors
-flask-limiter
 flask-login
-flask-restful
-flask-sqlalchemy
-sqlalchemy
+flask-socketio
