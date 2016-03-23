@@ -3,7 +3,7 @@ class Options(object):
     def __init__(self):
 
         # Preprocessing Parameters
-        self.sentence_padding = 20
+        self.sentence_padding = 50
         self.sentence_padding_token = "<PAD/>"
 
         # CNN Parameters
@@ -15,7 +15,7 @@ class Options(object):
 
         # Training parameters
         self.batch_size = 64 # Batch Size (default: 64)
-        self.num_epochs =  500 # Number of training epochs (default: 200)
+        self.num_epochs =  5 # Number of training epochs (default: 200)
         self.evaluate_every =  100 # Evaluate model on dev set after this many steps (default: 100)
         self.checkpoint_every =  100 # Save model after this many steps (default: 100)
 

@@ -1,3 +1,6 @@
+import itertools
+from collections import Counter
+import csv
 
 # Globals
 vocabulary_inv = None
@@ -12,10 +15,40 @@ from models.TextCNN import TextCNN
 
 import training
 from training.train import train
+from training import preprocess
 
-from hosting.host import host
+from hosting.host import launch as hosting_launch
+from hosting.host import eval as evalString
 
 import api
-from api.ApiController import launch
+from api.ApiController import launch as api_launch
+
+def launch():
+    hosting_launch()
+    api_launch()
+    print(evalString("bill clinton is an idiot"))
 
 
+
+sentences = []
+with open('data.csv', 'rb') as f:
+    reader = csv.reader(f, delimiter=',')
+
+    for row in reader:
+        words = preprocess.clean(row[1])
+        sentences.append(words)
+
+padded_sentences = [ preprocess.pad(sentence) for sentence in sentences ]
+
+word_counts = Counter(itertools.chain(*padded_sentences))
+
+# Mapping from index to word
+vocabulary_inv = [x[0] for x in word_counts.most_common()]
+# Mapping from word to index
+vocabulary = {x: i for i, x in enumerate(vocabulary_inv)}
+
+del word_counts
+del padded_sentences
+del row
+del words
+del sentences

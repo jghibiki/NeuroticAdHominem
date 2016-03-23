@@ -1,28 +1,31 @@
-import NeuralAdHominem as nah
-from NeuralAdHominem import TextCNN
-from NeuralAdHominem import Options as opts
-from NeuralAdHominem.training import preprocess
-from NeuralAdHominem.hosting.EvalModel import EvalModel
+import NeuroticAdHominem as nah
+from NeuroticAdHominem import TextCNN
+from NeuroticAdHominem import Options as opts
+from NeuroticAdHominem.training import preprocess
+from NeuroticAdHominem.hosting.EvalModel import EvalModel
 
 import tensorflow as tf
 import numpy as np
 from multiprocessing import Pipe, Process
 
 host_process = None
+parent_conn = None
 
-
-def fork_host():
+def launch():
     """
         Begin the model eval process
     """
+    global parent_conn
+    global host_process
     parent_conn, child_conn = Pipe()
     host_process = Process(target=host, args=(child_conn,))
-    host_proces.start()
+    host_process.start()
 
-def defork_host():
+def kill():
     """
         Wait for model eval process to end
     """
+    global host_process
     if(host_process):
         host_process.join()
 
@@ -44,11 +47,11 @@ def host(conn):
 
         # get word id's
         for word in padded_sentence:
-            if(word not in nah.vocabulary_inv.keys()):
-                nah.vocabulary.append(word)
-                nah.vocabulary_inv[word] = nah.vocabulary.index(word)
+            if(word not in nah.vocabulary.keys()):
+                nah.vocabulary_inv.append(word)
+                nah.vocabulary[word] = nah.vocabulary_inv.index(word)
 
-            word_ids.append(nah.vocabulary_inv[word])
+            word_ids.append(nah.vocabulary[word])
 
         # run evaluation
         result = model.eval(np.array(word_ids))
@@ -61,6 +64,7 @@ def eval(sentence):
     """
         Send a sentence to the eval process and wait for the result.
     """
+    global parent_conn
     parent_conn.send(sentence)
     result = parent_conn.recv()
     return result

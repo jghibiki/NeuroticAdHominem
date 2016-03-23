@@ -12,10 +12,10 @@ import os
 import time
 import datetime
 from sklearn.cross_validation import StratifiedShuffleSplit
-import NeuralAdHominem as nah
-from NeuralAdHominem import TextCNN
-from NeuralAdHominem import Options as opts
-from NeuralAdHominem.training import preprocess
+import NeuroticAdHominem as nah
+from NeuroticAdHominem import TextCNN
+from NeuroticAdHominem import Options as opts
+from NeuroticAdHominem.training import preprocess
 
 
 def batch_iter(data, batch_size, num_epochs):
@@ -36,24 +36,6 @@ def batch_iter(data, batch_size, num_epochs):
 
 
 def train():
-
-    urlFinder = re.compile('\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*')
-    atNameFinder = re.compile(r'@([A-Za-z0-9_]+)')
-    atNameCounter = 0
-
-    exclude_punc = set([
-            "!",
-            "?",
-            ".",
-            ",",
-            ":",
-            ";",
-            "'",
-            "\"",
-            "“",
-            "’",
-            "-"
-    ])
 
     sentences = []
     labels = []
@@ -77,7 +59,7 @@ def train():
     # Mapping from index to word
     nah.vocabulary_inv = [x[0] for x in word_counts.most_common()]
     # Mapping from word to index
-    nah.vocabulary = {x: i for i, x in enumerate(vocabulary_inv)}
+    nah.vocabulary = {x: i for i, x in enumerate(nah.vocabulary_inv)}
 
 
     x = np.array([[nah.vocabulary[word] for word in sentence] for sentence in padded_sentences])
@@ -104,8 +86,8 @@ def train():
 
     with tf.Graph().as_default():
         session_conf = tf.ConfigProto(
-          allow_soft_placement=allow_soft_placement,
-          log_device_placement=log_device_placement)
+          allow_soft_placement=opts.allow_soft_placement,
+          log_device_placement=opts.log_device_placement)
         sess = tf.Session(config=session_conf)
         with sess.as_default():
             cnn = TextCNN(
@@ -135,10 +117,10 @@ def train():
                 feed_dict = {
                   cnn.input_x: x_batch,
                   cnn.input_y: y_batch,
-                  cnn.dropout_keep_prob: dropout_keep_prob
+                  cnn.dropout_keep_prob: opts.dropout_keep_prob
                 }
-                _, step, summaries, loss, accuracy = sess.run(
-                    [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
+                _, step, loss, accuracy = sess.run(
+                    [train_op, global_step, cnn.loss, cnn.accuracy],
                     feed_dict)
 
             def dev_step(x_batch, y_batch):
@@ -158,13 +140,13 @@ def train():
 
             # Generate batches
             batches = batch_iter(
-                zip(x_train, y_train), batch_size, num_epochs)
+                zip(x_train, y_train), opts.batch_size, opts.num_epochs)
             # Training loop. For each batch...
             for batch in batches:
                 x_batch, y_batch = zip(*batch)
                 train_step(x_batch, y_batch)
                 current_step = tf.train.global_step(sess, global_step)
-                if current_step % evaluate_every == 0:
+                if current_step % opts.evaluate_every == 0:
                     print("\nEvaluation:")
                     dev_step(x_dev, y_dev)
                     print("")
