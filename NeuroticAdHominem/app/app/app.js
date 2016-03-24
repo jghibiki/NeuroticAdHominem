@@ -9,7 +9,7 @@ angular.module('nah', [
   'nah.version'
 ]).
 config(['$routeProvider', function($routeProvider) {
-  $routeProvider.otherwise({redirectTo: '/nah'});
+  $routeProvider.otherwise({redirectTo: '/feed'});
 }]).
 factory('socket', function (socketFactory) {
   return socketFactory({

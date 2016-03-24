@@ -2,6 +2,7 @@ import itertools
 from collections import Counter
 import csv
 
+
 # Globals
 vocabulary_inv = None
 vocabulary = None
@@ -17,13 +18,17 @@ import training
 from training.train import train
 from training import preprocess
 
+
 from hosting.host import launch as hosting_launch
 from hosting.host import eval
+
+from streaming.streamer import launch as streamer_launch
 
 from app.Server import launch as app_launch
 
 def launch():
     hosting_launch()
+    streamer_launch()
     app_launch()
     print(eval("bill clinton is an idiot"))
 

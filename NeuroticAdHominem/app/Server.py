@@ -6,7 +6,7 @@ def launch():
 
     app = Flask(__name__, static_url_path='', static_folder='app')
     app.secret_key = "bGhmsER0KydumulGTRa2"
-    socketio = SocketIO(app)
+    socketio = SocketIO(app, message_queue="redis://redis")
 
 
     @app.route('/')
@@ -19,4 +19,6 @@ def launch():
         emit("eval::response", result)
 
     #start server
-    socketio.run(app, debug=True, host="0.0.0.0")
+    socketio.run(app, debug=False, host="0.0.0.0")
+
+

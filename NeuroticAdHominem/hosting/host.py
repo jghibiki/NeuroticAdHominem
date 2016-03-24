@@ -3,6 +3,7 @@ from NeuroticAdHominem import TextCNN
 from NeuroticAdHominem import Options as opts
 from NeuroticAdHominem.training import preprocess
 from NeuroticAdHominem.hosting.EvalModel import EvalModel
+from flask_socketio import emit
 
 import tensorflow as tf
 import numpy as np
@@ -11,15 +12,18 @@ from multiprocessing import Pipe, Process
 host_process = None
 parent_conn = None
 
+
 def launch():
     """
         Begin the model eval process
     """
     global parent_conn
     global host_process
+
     parent_conn, child_conn = Pipe()
     host_process = Process(target=host, args=(child_conn,))
     host_process.start()
+
 
 def kill():
     """
@@ -49,6 +53,7 @@ def host(conn):
         for word in padded_sentence:
             word = word.encode('ascii', 'replace')
             if(word not in nah.vocabulary.keys()):
+                print("New word: %s" % word)
                 nah.vocabulary_inv.append(word)
                 nah.vocabulary[word] = nah.vocabulary_inv.index(word)
 
@@ -69,4 +74,8 @@ def eval(sentence):
     parent_conn.send(sentence)
     result = parent_conn.recv()
     return result
+
+
+def emitEval(sentence, classification):
+    emit("stream:eval", {"sentence": sentence, "classification": classification})
 

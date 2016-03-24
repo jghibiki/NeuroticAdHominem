@@ -12,9 +12,17 @@ angular.module('nah.feed', ['ngRoute'])
 .controller('FeedCtrl', ["$scope", "socket", function($scope, socket) {
     $scope.stringToEval = "";
     $scope.evalResponse = "";
+    $scope.feed = [];
 
     socket.on("eval::response", function(resp){
         $scope.evalResponse = resp;
+    });
+
+    socket.on("stream:eval", function(resp){
+        if($scope.feed.length > 100){
+            $scope.feed.splice(0, 1);
+        }
+        $scope.feed.push(resp); 
     });
 
     $scope.evalString = function(){

@@ -1,3 +1,6 @@
+requests[security]
+tweepy
 flask
 flask-login
 flask-socketio
+redis
