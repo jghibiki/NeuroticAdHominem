@@ -12,17 +12,34 @@ angular.module('nah.feed', ['ngRoute'])
 .controller('FeedCtrl', ["$scope", "socket", function($scope, socket) {
     $scope.stringToEval = "";
     $scope.evalResponse = "";
-    $scope.feed = [];
+    $scope.cleanFeed = [];
+    $scope.dirtyFeed = [];
+    $scope.cleanCount = 0;
+    $scope.dirtyCount = 0;
+    $scope.pauseScroll = false;
 
     socket.on("eval::response", function(resp){
         $scope.evalResponse = resp;
     });
 
     socket.on("stream:eval", function(resp){
-        if($scope.feed.length > 100){
-            $scope.feed.splice(0, 1);
+        if(!$scope.pauseScroll){
+
+            if(resp.classification == "example"){
+                if($scope.dirtyFeed.length > 20){
+                    $scope.dirtyFeed.splice(0, 1);
+                }
+                $scope.dirtyCount = $scope.dirtyCount + 1;
+                $scope.dirtyFeed.push(resp); 
+            }
+            else{
+                if($scope.cleanFeed.length > 20){
+                    $scope.cleanFeed.splice(0, 1);
+                }
+                $scope.cleanCount = $scope.cleanCount + 1;
+                $scope.cleanFeed.push(resp); 
+            }
         }
-        $scope.feed.push(resp); 
     });
 
     $scope.evalString = function(){

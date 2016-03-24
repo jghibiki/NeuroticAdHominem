@@ -10,7 +10,19 @@
 
 
 <h2>Feed</h2>
-<p ng-repeat="class in feed">
-    Sentence: {{class.sentence}}<br>
-    Classification: {{class.classification}}
-</p>
+<button ng-click="pauseScroll = !pauseScroll">Pause/Resume Update</button>
+<div class="pure-g">
+    <div class="pure-u-1-2">
+        <p><b>Dirty Tweets:</b> {{dirtyCount}}</p>
+        <p ng-repeat="class in dirtyFeed">
+            {{class.sentence}}
+        </p>
+    </div>
+    <div class="pure-u-1-2">
+        <p><b>Clean Tweets:</b> {{cleanCount}}</p>
+        <p ng-repeat="class in cleanFeed">
+            {{class.sentence}}
+        </p>
+        
+    </div>
+</div>
