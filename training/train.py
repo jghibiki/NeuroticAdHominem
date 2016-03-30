@@ -16,6 +16,9 @@ from NeuroticAdHominem import TextCNN
 from NeuroticAdHominem import Options as opts
 from NeuroticAdHominem.training import preprocess
 
+training_process = None
+training_conn = None
+
 
 def batch_iter(data, batch_size, num_epochs):
     """
