@@ -1,5 +1,5 @@
-from NeuroticAdHominem.training import preprocess
-import itertools
+import preprocess
+import  itertools
 from collections import Counter
 import csv
 

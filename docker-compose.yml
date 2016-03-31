@@ -1,12 +1,51 @@
 version: '2'
 services:
-    nah: 
-        build: .
+    flaskapp: 
+        build: ./flaskapp/
         ports:
             - "5000:5000"
         links:
             - redis
         depends_on:
             - redis
+    training:
+        build: ./training/
+        links:
+            - redis
+        depends_on:
+            - redis
+        environment:
+            - SENTENCE_PADDING = 50
+            - SENTENCE_PADDING_TOKEN = "<PAD/>"
+
+            # CNN Parameters
+            - EMBEDDING_DIM = 20 # Dimensionality of character embedding (default: 128)
+            - FILTER_SIZES = "3,4,5" # Comma-separated filter sizes (default: '3,4,5')
+            - NUM_FILTERS = 50  # Number of filters per filter size (default: 128)
+            - DROPOUT_KEEP_PROB = 0.5 # Dropout keep probability (default: 0.5)
+            - L2_REG_LAMBDA = 3.0 # L2 regularizaion lambda (default: 0.0)
+            - VOCAB_OVERSIZING = 5000 # how many words to leave room for
+
+            # Training parameters
+            - BATCH_SIZE = 64 # Batch Size (default: 64)
+            - NUM_EPOCHS =  500 # Number of training epochs (default: 200)
+            - EVALUATE_EVERY = 100 # Evaluate model on dev set after this many steps (default: 100)
+            - CHECKPOINT_EVERY = 100 # Save model after this many steps (default: 100)
+
+            # Export Parameters
+            - EXPORT_VERSION = 1 # Version number for exporing the model
+            - MODEL_LOCATION = "/tmp/"
+
+            # Misc Parameters
+            - ALLOW_SOFT_PLACEMENT = "true" # Allow device soft device placement
+            - LOG_DEVICE_PLACEMENT = "false" # Log placement of ops on devices
+            - DISPLAY_TRAIN_STEPS = "false" #"toggles output of training step results")
+    streaming:
+        build: ./streaming/
+        links:
+            - redis
+        depends_on:
+            - redis
+
     redis:
         image: redis

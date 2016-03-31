@@ -1,7 +1,7 @@
-import NeuroticAdHominem as nah
-from NeuroticAdHominem import TextCNN
-from NeuroticAdHominem import Options as opts
-from NeuroticAdHominem.training import preprocess
+from TextCNN import TextCNN
+from store import options as opts
+from store import vocab
+import preprocess
 
 import tensorflow as tf
 import numpy as np
@@ -11,19 +11,19 @@ class EvalModel(object):
         graph = tf.Graph()
 
         session_conf = tf.ConfigProto(
-          allow_soft_placement=opts.allow_soft_placement,
-          log_device_placement=opts.log_device_placement)
+          allow_soft_placement=opts["allow_soft_placement"],
+          log_device_placement=opts["log_device_placement"])
         session = tf.Session(config=session_conf)
 
 
         cnn = TextCNN(
-            sequence_length=opts.sentence_padding,
+            sequence_length=opts["sentence_padding"],
             num_classes=2,
-            vocab_size=len(nah.vocabulary) + opts.vocab_oversizing,
-            embedding_size=opts.embedding_dim,
-            filter_sizes=map(int, opts.filter_sizes.split(",")),
-            num_filters=opts.num_filters,
-            l2_reg_lambda=opts.l2_reg_lambda)
+            vocab_size=len(vocab.vocabulary) + opts["vocab_oversizing"],
+            embedding_size=opts["embedding_dim"],
+            filter_sizes=map(int, opts["filter_sizes"].split(",")),
+            num_filters=opts["num_filters"],
+            l2_reg_lambda=opts["l2_reg_lambda"])
 
         global_step = tf.Variable(0, name="global_step", trainable=False)
         optimizer = tf.train.AdamOptimizer(1e-4)
@@ -33,7 +33,7 @@ class EvalModel(object):
         session.run(tf.initialize_all_variables())
 
         saver = tf.train.Saver(tf.all_variables())
-        ckpt = tf.train.get_checkpoint_state(opts.model_location)
+        ckpt = tf.train.get_checkpoint_state(opts["model_location"] + "model.chpt")
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(session, ckpt.model_checkpoint_path)
 

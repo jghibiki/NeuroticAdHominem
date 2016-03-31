@@ -4,3 +4,4 @@ flask
 flask-login
 flask-socketio
 redis
+flask-redis

@@ -1,4 +1,4 @@
-from NeuroticAdHominem import Options as opts
+from store import options as opts
 import re
 
 urlFinder = re.compile('\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*')
@@ -44,11 +44,11 @@ def clean(string):
 
 def pad(sentence):
 
-    if(opts.sentence_padding < len(sentence)):
+    if(opts["sentence_padding"] < len(sentence)):
         raise Exception("Increase sentence_padding, found sentence that is %s words long. sentence_padding must be greater than or equal to the number of words in the longest sentence" % len(sentence))
     else:
-        for x in range(opts.sentence_padding - len(sentence)):
-            sentence.append(opts.sentence_padding_token)
+        for x in range(opts["sentence_padding"] - len(sentence)):
+            sentence.append(opts["sentence_padding_token"])
     return sentence
 
 

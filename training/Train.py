@@ -6,19 +6,17 @@ import re
 import numpy as np
 import string
 import tensorflow as tf
-import numpy as np
 import os
 import time
 import datetime
 from sklearn.cross_validation import StratifiedShuffleSplit
-import NeuroticAdHominem as nah
-from NeuroticAdHominem import TextCNN
-from NeuroticAdHominem import Options as opts
-from NeuroticAdHominem.training import preprocess
+from TextCNN import TextCNN
+from store import options as opts
+from store import vocab
+import preprocess
 
 training_process = None
 training_conn = None
-
 
 def batch_iter(data, batch_size, num_epochs):
     """
@@ -59,12 +57,12 @@ def train():
     word_counts = Counter(itertools.chain(*padded_sentences))
 
     # Mapping from index to word
-    nah.vocabulary_inv = [x[0] for x in word_counts.most_common()]
+    vocab.vocabulary_inv = [x[0] for x in word_counts.most_common()]
     # Mapping from word to index
-    nah.vocabulary = {x: i for i, x in enumerate(nah.vocabulary_inv)}
+    vocab.vocabulary = {x: i for i, x in enumerate(vocab.vocabulary_inv)}
 
 
-    x = np.array([[nah.vocabulary[word] for word in sentence] for sentence in padded_sentences])
+    x = np.array([[vocab.vocabulary[word] for word in sentence] for sentence in padded_sentences])
     y = np.array(labels)
 
 
@@ -88,18 +86,18 @@ def train():
 
     with tf.Graph().as_default():
         session_conf = tf.ConfigProto(
-          allow_soft_placement=opts.allow_soft_placement,
-          log_device_placement=opts.log_device_placement)
+          allow_soft_placement=opts["allow_soft_placement"],
+          log_device_placement=opts["log_device_placement"])
         sess = tf.Session(config=session_conf)
         with sess.as_default():
             cnn = TextCNN(
                 sequence_length=x_train.shape[1],
                 num_classes=2,
-                vocab_size=len(nah.vocabulary),
-                embedding_size=opts.embedding_dim,
-                filter_sizes=map(int, opts.filter_sizes.split(",")),
-                num_filters=opts.num_filters,
-                l2_reg_lambda=opts.l2_reg_lambda)
+                vocab_size=len(vocab.vocabulary),
+                embedding_size=opts["embedding_dim"],
+                filter_sizes=map(int, opts["filter_sizes"].split(",")),
+                num_filters=opts["num_filters"],
+                l2_reg_lambda=opts["l2_reg_lambda"])
 
             # Define Training procedure
             global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -119,7 +117,7 @@ def train():
                 feed_dict = {
                   cnn.input_x: x_batch,
                   cnn.input_y: y_batch,
-                  cnn.dropout_keep_prob: opts.dropout_keep_prob
+                  cnn.dropout_keep_prob: opts["dropout_keep_prob"]
                 }
                 _, step, loss, accuracy = sess.run(
                     [train_op, global_step, cnn.loss, cnn.accuracy],
@@ -142,16 +140,16 @@ def train():
 
             # Generate batches
             batches = batch_iter(
-                zip(x_train, y_train), opts.batch_size, opts.num_epochs)
+                zip(x_train, y_train), opts["batch_size"], opts["num_epochs"])
             # Training loop. For each batch...
             for batch in batches:
                 x_batch, y_batch = zip(*batch)
                 train_step(x_batch, y_batch)
                 current_step = tf.train.global_step(sess, global_step)
-                if current_step % opts.evaluate_every == 0:
+                if current_step % opts["evaluate_every"] == 0:
                     print("\nEvaluation:")
                     dev_step(x_dev, y_dev)
                     print("")
 
-            saver.save(sess, opts.model_location)
+            saver.save(sess, opts["model_location"] + "model.chpt")
 

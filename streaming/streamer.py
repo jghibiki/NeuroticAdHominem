@@ -2,9 +2,8 @@ from __future__ import unicode_literals
 from tweepy import OAuthHandler
 from tweepy import Stream
 import tweepy, datetime, signal, sys, json
-from multiprocessing import Pool, Process, Pipe
-from NeuroticAdHominem import eval
-from flask_socketio import SocketIO
+import redis
+import json
 
 # Variables that contains the user credentials to access Twitter API
 access_token = "4010739394-F156dCIH53L1pfstMxF7PlqkmfDJEZJScb0qGAv"
@@ -33,10 +32,13 @@ class StreamListener(tweepy.StreamListener):
     """
     def __init__(self):
         super(tweepy.StreamListener, self).__init__()
-        self.socketio = SocketIO(message_queue="redis://redis")
+        self.redis = redis.Redis(host="redis")
 
-    def emitEval(self, sentence, classification):
-        self.socketio.emit("stream:eval", {"sentence": sentence, "classification": classification})
+
+    def emitEval(self, sentence):
+        sentence = sentence.encode('ascii', 'replace')
+        self.redis.publish("model", json.dumps(["eval", sentence]))
+
 
     def on_data(self, _data):
         data = json.loads(_data)
@@ -51,13 +53,12 @@ class StreamListener(tweepy.StreamListener):
                     data["user"]["id_str"] == christie_id or
                     data["user"]["id_str"] == rubio_id)):
                 #print("CT: %s" % data["text"])
-                result = eval(data["text"])
+                result = data["text"]
                 self.emitEval(data["text"], result)
 
             elif "retweeted_status" not in data:
                 #print("OT: %s" % data["text"])
-                result = eval(data["text"])
-                self.emitEval(data["text"], result)
+                self.emitEval(data["text"])
 
             #elif "retweeted_status" in data:
             #    #print("RT: %s" % data["text"])
@@ -77,7 +78,7 @@ def GracefulExit(_signal, frame):
         sys.exit(0)
 
 
-def launch():
+if __name__ == "__main__":
     # set up exit handler
     signal.signal(signal.SIGINT, GracefulExit)
 
@@ -93,6 +94,6 @@ def launch():
     sys.stdout.flush()
     #while(True):
     #    try:
-    stream.filter(follow=[trump_id, hilary_id, sanders_id, bush_id, cruz_id, carson_id, christie_id, rubio_id], async=True)
+    stream.filter(follow=[trump_id, hilary_id, sanders_id, bush_id, cruz_id, carson_id, christie_id, rubio_id], async=False)
     #    except Exception:
     #        print(e)
