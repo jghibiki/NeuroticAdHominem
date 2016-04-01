@@ -1,8 +1,11 @@
 import os, sys
 
+def log(msg):
+    print(msg)
+    sys.stdout.flush()
 
 options = {
-        "sentence_padding": os.getenv('SENTENCE_PADDING', 50),
+        "sentence_padding": os.getenv('SENTENCE_PADDING', 75),
         "sentence_padding_token": os.getenv('SENTENCE_PADDING_TOKEN', "<PAD/>"),
 
         # CNN Parameters
@@ -15,7 +18,7 @@ options = {
 
         # Training parameters
         "batch_size": os.getenv('BATCH_SIZE', 64),
-        "num_epochs": os.getenv('NUM_EPOCHS',  2),
+        "num_epochs": os.getenv('NUM_EPOCHS',  500),
         "evaluate_every": os.getenv('EVALUATE_EVERY',  100),
         "checkpoint_every": os.getenv('CHECKPOINT_EVERY', 100),
 
@@ -37,6 +40,3 @@ Vocabulary = Vocabulary()
 vocab = Vocabulary
 vocabulary = vocab
 
-def log(msg):
-    print(msg)
-    sys.stdout.flush()

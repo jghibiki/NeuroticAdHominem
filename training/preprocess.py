@@ -3,7 +3,6 @@ import re
 
 urlFinder = re.compile('\w+:\/{2}[\d\w-]+(\.[\d\w-]+)*(?:(?:\/[^\s/]*))*')
 atNameFinder = re.compile(r'@([A-Za-z0-9_]+)')
-atNameCounter = 0
 
 exclude_punc = set([
         "!",
@@ -15,11 +14,12 @@ exclude_punc = set([
         "'",
         "\"",
         "'",
-        "-"
+        "-",
+        "(",
+        ")"
 ])
 
 def clean(string):
-    global atNameCounter
     global atNameFinder
     global urlFinder
 
@@ -32,13 +32,17 @@ def clean(string):
         .replace("&lt;", "") \
         .lower().split():
 
+        word = word.replace(" ", "")
         if urlFinder.match(word):
             words.append("<URL/>")
         elif atNameFinder.search(word):
             words.append("<AT_NAME/>")
-            atNameCounter +=1
         else:
+            word = ''.join([i if ord(i) < 128 else '' for i in word])
             word = ''.join(ch for ch in word if ch not in exclude_punc)
+            word.strip()
+            if word != "":
+                words.append(word)
             words.append(word)
     return words
 

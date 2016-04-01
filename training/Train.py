@@ -54,14 +54,6 @@ def train():
 
     padded_sentences = [ preprocess.pad(sentence) for sentence in sentences ]
 
-    word_counts = Counter(itertools.chain(*padded_sentences))
-
-    # Mapping from index to word
-    vocab.vocabulary_inv = [x[0] for x in word_counts.most_common()]
-    # Mapping from word to index
-    vocab.vocabulary = {x: i for i, x in enumerate(vocab.vocabulary_inv)}
-
-
     x = np.array([[vocab.vocabulary[word] for word in sentence] for sentence in padded_sentences])
     y = np.array(labels)
 
@@ -95,6 +87,7 @@ def train():
                 num_classes=2,
                 vocab_size=len(vocab.vocabulary),
                 embedding_size=opts["embedding_dim"],
+                embedding_tensor=vocab.embeddings,
                 filter_sizes=map(int, opts["filter_sizes"].split(",")),
                 num_filters=opts["num_filters"],
                 l2_reg_lambda=opts["l2_reg_lambda"])
