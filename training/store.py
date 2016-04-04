@@ -7,6 +7,7 @@ def log(msg):
 options = {
         "sentence_padding": os.getenv('SENTENCE_PADDING', 75),
         "sentence_padding_token": os.getenv('SENTENCE_PADDING_TOKEN', "<PAD/>"),
+	"unknown_word_token": os.getenv("UNKOWN_WORD_TOKEN", "<UNK/>"),
 
         # CNN Parameters
         "embedding_dim": os.getenv('EMBEDDING_DIM', 20),

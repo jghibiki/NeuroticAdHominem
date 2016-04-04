@@ -23,7 +23,7 @@ class Vocabulary(object):
 
         # Build Vocab
         with open('vocab.csv', 'rb') as f:
-            reader = csv.reader(f.read().splitlines())
+            reader = csv.reader(f, delimiter=',')
 
             for row in reader:
                 if len(row) > 0:
@@ -32,6 +32,7 @@ class Vocabulary(object):
                         self.addWord(word)
 
         self.addWord(opts["sentence_padding_token"])
+	self.addWord(opts["unknown_word_token"])
         self.vocabulary_size = len(self.wordSet)
         store.log("Vocabulary Size: %s" % self.vocabulary_size)
 
@@ -48,12 +49,6 @@ class Vocabulary(object):
             self.embeddings = pickle.load(f)
 
     def train(self):
-        count = ['UNK']
-        count.extend(self.vocabulary_inv)
-        dictionary = dict()
-        for word in count:
-            dictionary[word] = len(dictionary)
-        unk_count = 0
 
         self.data = [ idx for word, idx in self.vocabulary.iteritems() ]
 
@@ -89,7 +84,7 @@ class Vocabulary(object):
             store.log('%s -> %s' % (self.vocabulary_inv[batch[i]], self.vocabulary_inv[labels[i, 0]]))
 
         batch_size = 20
-        embedding_size = 128  # Dimension of the embedding vector.
+        embedding_size = opts["embedding_dim"]  # Dimension of the embedding vector.
         skip_window = 10       # How many words to consider left and right.
         num_skips = 20         # How many times to reuse an input to generate a label.
         # We pick a random validation set to sample nearest neighbors. Here we limit the
@@ -215,3 +210,7 @@ class Vocabulary(object):
 
     def resetGrowth(self):
         self.vocabGrowth = 0
+
+    def getEmbeddingFromWord(self, word):
+	index = self.getIdFromWord(word)
+	return self.embeddings[index]

@@ -43,7 +43,6 @@ def clean(string):
             word.strip()
             if word != "":
                 words.append(word)
-            words.append(word)
     return words
 
 def pad(sentence):

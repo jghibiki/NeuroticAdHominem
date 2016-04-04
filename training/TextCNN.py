@@ -19,8 +19,8 @@ class TextCNN(object):
 
         # Embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
-            W = tf.Constant(embeddings_tensor,name="W")
-            self.embedded_chars = tf.nn.embedding_lookup(W, self.input_x)
+            self.embedding_W = tf.Variable(embedding_tensor, name="W")
+            self.embedded_chars = tf.nn.embedding_lookup(self.embedding_W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
 
         # Create a convolution + maxpool layer for each filter size

@@ -11,6 +11,7 @@ import time
 import datetime
 from sklearn.cross_validation import StratifiedShuffleSplit
 from TextCNN import TextCNN
+import store
 from store import options as opts
 from store import vocab
 import preprocess
@@ -54,7 +55,12 @@ def train():
 
     padded_sentences = [ preprocess.pad(sentence) for sentence in sentences ]
 
-    x = np.array([[vocab.vocabulary[word] for word in sentence] for sentence in padded_sentences])
+    x = np.array([[vocab.getIdFromWord(word) for word in sentence] for sentence in padded_sentences])
+    embeddings = np.array(map(np.unique, ([ vocab.getEmbeddingFromWord(word) for word in sentence for sentence in padded_sentences])))
+    store.log(embeddings)
+    store.log(len(embeddings))
+    store.log(embeddings[0])
+    store.log(len(embeddings[0]))
     y = np.array(labels)
 
 
@@ -85,9 +91,9 @@ def train():
             cnn = TextCNN(
                 sequence_length=x_train.shape[1],
                 num_classes=2,
-                vocab_size=len(vocab.vocabulary),
+                vocab_size=len(embeddings),
                 embedding_size=opts["embedding_dim"],
-                embedding_tensor=vocab.embeddings,
+                embedding_tensor=embeddings,
                 filter_sizes=map(int, opts["filter_sizes"].split(",")),
                 num_filters=opts["num_filters"],
                 l2_reg_lambda=opts["l2_reg_lambda"])
