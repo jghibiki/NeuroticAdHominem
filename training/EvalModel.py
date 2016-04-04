@@ -21,6 +21,7 @@ class EvalModel(object):
             num_classes=2,
             vocab_size=len(vocab.vocabulary) + opts["vocab_oversizing"],
             embedding_size=opts["embedding_dim"],
+            embedding_tensor=vocab.embeddings,
             filter_sizes=map(int, opts["filter_sizes"].split(",")),
             num_filters=opts["num_filters"],
             l2_reg_lambda=opts["l2_reg_lambda"])

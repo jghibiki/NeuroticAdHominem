@@ -32,7 +32,7 @@ class Vocabulary(object):
                         self.addWord(word)
 
         self.addWord(opts["sentence_padding_token"])
-	self.addWord(opts["unknown_word_token"])
+        self.addWord(opts["unknown_word_token"])
         self.vocabulary_size = len(self.wordSet)
         store.log("Vocabulary Size: %s" % self.vocabulary_size)
 
@@ -200,7 +200,12 @@ class Vocabulary(object):
 
     def getIdFromWord(self, word):
         word = word.encode('ascii', 'replace')
-        return self.vocabulary[word]
+        if(word in self.wordSet):
+            return self.vocabulary[word]
+        else:
+            print("Found unkown word: {0}".format(word))
+            sys.stdout.flush()
+            return self.vocabulary[opts["unknown_word_token"]]
 
     def getWordFromId(self, id):
         return self.vocabulary_inv[id]
@@ -212,5 +217,5 @@ class Vocabulary(object):
         self.vocabGrowth = 0
 
     def getEmbeddingFromWord(self, word):
-	index = self.getIdFromWord(word)
-	return self.embeddings[index]
+        index = self.getIdFromWord(word)
+        return self.embeddings[index]

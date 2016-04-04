@@ -38,11 +38,13 @@ class StreamListener(tweepy.StreamListener):
     def emitEval(self, sentence):
         sentence = sentence.encode('ascii', 'replace')
         self.redis.publish("model", json.dumps(["eval", sentence]))
+        print("Sending: \"{0}\"".format(sentence))
+        sys.stdout.flush()
 
 
     def on_data(self, _data):
         data = json.loads(_data)
-        if "delete" not in data:
+        if "delete" not in data and "user" in data:
             if ( "retweeted_status" not in data and
                   ( data["user"]["id_str"] == trump_id or
                     data["user"]["id_str"] == hilary_id or
@@ -54,7 +56,7 @@ class StreamListener(tweepy.StreamListener):
                     data["user"]["id_str"] == rubio_id)):
                 #print("CT: %s" % data["text"])
                 result = data["text"]
-                self.emitEval(data["text"], result)
+                self.emitEval(data["text"])
 
             elif "retweeted_status" not in data:
                 #print("OT: %s" % data["text"])
