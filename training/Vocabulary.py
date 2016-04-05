@@ -12,6 +12,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.models.rnn import rnn
 from tensorflow.models.rnn.rnn_cell import BasicLSTMCell, LSTMCell
+import sys
 
 class Vocabulary(object):
     def __init__(self):
@@ -136,7 +137,7 @@ class Vocabulary(object):
 
 
         # Step 5: Begin training.
-        num_steps = 1001
+        num_steps = 100001
         with tf.Session(graph=graph) as session:
             # We must initialize all variables before we use them.
             merged = tf.merge_all_summaries()

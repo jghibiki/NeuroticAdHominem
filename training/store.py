@@ -19,7 +19,7 @@ options = {
 
         # Training parameters
         "batch_size": os.getenv('BATCH_SIZE', 64),
-        "num_epochs": os.getenv('NUM_EPOCHS',  3),
+        "num_epochs": os.getenv('NUM_EPOCHS',  500),
         "evaluate_every": os.getenv('EVALUATE_EVERY',  100),
         "checkpoint_every": os.getenv('CHECKPOINT_EVERY', 100),
 
